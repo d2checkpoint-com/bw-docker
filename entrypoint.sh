@@ -1,10 +1,23 @@
 #!/bin/bash
 
+required_variables=("BW_CLIENTID" "BW_CLIENTSECRET" "BW_PASSWORD")
+
+for var in "${required_variables[@]}"; do
+    if [[ -z "${!var}" ]]; then
+        echo "Error: $var is not defined. Please set all required environment variables."
+        exit 1
+    fi
+done
+
 set -e
 
-bw config server ${BW_HOST}
+if [[ -n "${BW_HOST}" ]]; then
+    bw config server "${BW_HOST}"
+fi
 
-export BW_SESSION=$(bw login ${BW_USER} --passwordenv BW_PASSWORD --raw)
+bw login --apikey --raw
+
+export BW_SESSION=$(bw unlock --passwordenv BW_PASSWORD --raw)
 
 bw unlock --check
 
